@@ -40,7 +40,7 @@ The work brief requires a machine learning IDS designed with a recognised workfl
 
 Characteristics of NSL-KDD dataset:
 
-The current `nsl_kdd_dataset.csv` contains 22,544 records and 42 columns. There are 41 predictors and one target column named `labels`. Three predictors are categorical (`protocol_type`, `service`, and `flag`) and the remaining predictors are numerical. The target includes `normal` plus multiple attack categories such as `neptune`, `satan`, `smurf`, and `portsweep`. The file contains no missing values and 31 duplicate rows. Because the organisation requires binary intrusion detection, the target must be transformed from multi-class labels into two classes: normal and attack.
+The current `data/nsl_kdd_dataset.csv` contains 22,544 records and 42 columns. There are 41 predictors and one target column named `labels`. Three predictors are categorical (`protocol_type`, `service`, and `flag`) and the remaining predictors are numerical. The target includes `normal` plus multiple attack categories such as `neptune`, `satan`, `smurf`, and `portsweep`. The file contains no missing values and 31 duplicate rows. Because the organisation requires binary intrusion detection, the target must be transformed from multi-class labels into two classes: normal and attack.
 
 Specifications of NSL-KDD dataset:
 

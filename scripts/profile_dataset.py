@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 
 
-DATASET_PATH = Path("nsl_kdd_dataset.csv")
+DATASET_PATH = Path("data/nsl_kdd_dataset.csv")
 
 
 def main() -> None:
