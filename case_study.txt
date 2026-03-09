@@ -1,0 +1,78 @@
+Case study
+Problem Statement 
+Your organisation is facing security issues related to authorization, authentication, identification, IoT devices etc. from past few months. To resolve the security issues, your organisation have decided to use automated Intrusion Detection System (IDS) that employ advanced technologies i.e., machine learning (ML) to detect malicious activities. 
+You are working as security administrator in the Artificial Intelligence department. So as part of your department, you will train and evaluate the operations of ML based IDS model when processing previously unseen data.
+To do so, you will train and test the given IDS dataset using either supervised or unsupervised ML technique to classify normal and attack data. Then, you will be required to produce documentation of all performed work tasks in required organisational template or formats given in Activity sections.         
+
+Project requirements:
+The student need to train and evaluate the operations of machine learning (ML) models when processing previously unseen data. The student must fulfil the organisation requirements.
+Organisational Requirements
+The basic requirement of the organisation is to use ML technology such as
+Design IDS either using supervised or unsupervised ML technique.
+Use NSL KDD IDS dataset to train and test the model.
+Train and test the IDS by selecting at least 5000 samples randomly using training and testing sets.
+Pre-process the randomly selected data using data conversion and min-max normalization technique.
+Make use of feature engineering approach using Principal Component Analysis (PCA) technique to select subset of features.   
+After feature selection, classify the normal and attack data through binary classification.
+Measure the performance of design IDS model using following parameters:
+Classification Accuracy
+Precision
+Recall
+F-score
+Document the performance of model using organisational guidelines according to given template.
+You are working as a security administrator in your organisation. The management of the organisation wants you to train and evaluate the operations of machine learning (ML) models when processing previously unseen data. 
+Organisational Procedure
+All IT users will act responsibly, ethically, and legally, limiting their usage of IT resources to the organisation instructional mission and lawful business. All organisation Policies and Procedures will be followed by IT users.
+Employees who have access to organisation-owned IT resources are only allowed to use them for work-related purposes.
+The organisation reserves the right, with or without notice, to monitor IT resources, including activity and accounts, in order to safeguard the integrity, security, and functionality of IT resources.
+Backing up data, recording activity, monitoring general usage trends, and other activities as needed to support organisation operations are all part of normal management and maintenance of organisation IT resources.
+The unacceptable usage of IT resources or systems include, but are not limited to:
+Use of information technology resources or systems in violation of municipal, state, or federal law or regulation;
+Violation of organisation Policies and Procedures by using IT resources or systems;
+Transmission and/or collection of organisation data, particularly sensitive data, to unauthorised and/or unapproved persons or systems 
+Unauthorized efforts to change data files or systems at the organisation.
+Unauthorized access to email, voice mail, data, or systems
+Use of IT resources that disable other IT resources, consume IT resources disproportionately in a way that other users are denied reasonable access, or materially increase the cost of IT resources
+Intentional use, distribution, or creation of malware or other malicious software
+Use of any device, system, or method that negatively impacts the availability or integrity of IT resources
+Use of IT resources that materially increase the cost of IT resources
+Sensitive personally identifiable information (PII) data may not be saved directly on personal devices.
+Student Responsibilities in Information Technology
+Individual account passwords will be protected, with the exception of accounts created for approved organisation events (which are not applicable to public access computers).
+Adherence to all copyright, intellectual property, libel, and privacy laws 
+Compliance with software licence and other contract terms
+Obtain permission from the Director of Technical Support Services before purchasing, downloading, or installing software on organisation-owned hardware.
+Employees and trustees using organisation email as the official means of electronic communication
+Immediate reporting to the Director of Technical Support Services of any loss, damage, theft, or misuse of IT Resources
+Logging off or locking devices or systems when not in use.
+Procedure for Lodging the documents
+The original signed document or documents must be lodged in paper format with the organisation. Only original signed documents can be lodged; photocopies will not be accepted.
+Only between the hours of 9.30 a.m. and 4.00 p.m. can documents be lodged in person at the organisation offices/departments.
+Before presenting the documents for lodgement, it is the obligation of the person/s lodging them to ensure that they have been completed accurately. The lodgement acceptability guide and checklist are publications that help lodging students confirm that paperwork are completed appropriately.
+Lodgement Acceptability Check
+All paper papers submitted to organisation for lodgement undergo a preliminary review to confirm that they have been filled out correctly and that the fundamental information given is correct.
+The Lodgement Acceptability Check or LAC is the first step. When a paper document is presented for lodgement, LAC happens.
+Documents that pass the LAC check are allowed for filing, and the registration fee (if applicable) is due at this stage.
+Documents that fail the LAC check will not be accepted for lodgement and will be returned to the lodging party to fix any defects discovered during the LAC procedure.
+The LAC process checks paper documents for the following general criteria for correctness:
+lodging student details
+duplicate titles provided (where applicable)
+panels in documents completed including a correct consideration panel (where included)
+verification of Identity (VOI)
+original signing of documents
+documents are duty noted or duty certificate provided (where applicable)
+check the organisational requirements are met.
+check that each and every document templates given in the assessment are submitted in sorted manner and duly signed by the supervisor
+The title/s the subject of the new document/s accepted for lodgement are flagged as part of the lodgement procedure to indicate that there is now active action on the specific titles detailed in each document.
+Industry standard specific technologies used in industry
+The way the organisation work and engage with others is changing as a result of rising technologies. Indeed, technology is altering the way we do business and making high-tech approaches a fundamental part of our lives, with things like machine learning and touch commerce becoming increasingly popular across every area from banking to healthcare.
+Internet of Things (IoT)
+Machine Learning
+Virtual Reality
+Touch commerce
+Augmented Reality
+Deep Learning
+Cognitive Technology
+Robotic Process Automation
+Artificial Intelligence
+DevOps
