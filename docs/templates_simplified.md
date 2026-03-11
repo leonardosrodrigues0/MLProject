@@ -20,7 +20,6 @@ Technologies to be used and their basic concepts:
 - Pandas: loads and prepares tabular data
 - NumPy: numerical operations
 - Scikit-learn: preprocessing, model training, and evaluation
-- Matplotlib: charts for reporting
 
 Steps involved in designing IDS model:
 
