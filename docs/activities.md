@@ -56,7 +56,7 @@ This activity requires you to set training data parameters and select model size
 ### Steps
 
 1. **Set machine training data parameters** after splitting training dataset into 70:30 proportions according to work brief and select model size according to work brief.
-2. **Use selected parameter over training data** to train the model and apply feature engineering approach using PCA technique on required training data of NSL KDD dataset.
+2. **Use selected parameter over training data** to train the model and apply feature engineering through preprocessing and column filtering (ignore columns judged not relevant for training), including normalisation and other data cleaning techniques as required.
 3. **Finalise machine training data procedures** according to work brief and represent the procedure through block diagram in a document using **Template 3**.
 
 ---

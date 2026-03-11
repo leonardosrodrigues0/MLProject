@@ -14,9 +14,9 @@ Technologies to be used and their basic concepts:
 
 Python will be used as the implementation language because it supports efficient data analysis and ML experimentation.
 Pandas will manage tabular data preparation, cleaning, and transformation.
-Scikit-learn will support supervised learning, preprocessing, train-test splitting, PCA-based feature engineering, and performance metrics.
+Scikit-learn will support supervised learning, preprocessing, train-test splitting, feature selection via column filtering, and performance metrics.
 NumPy will handle numerical operations, while Matplotlib can be used to visualise outputs and support reporting.
-PCA is the selected feature engineering technique because it reduces dimensionality by transforming correlated variables into a smaller set of principal components while preserving useful variance.
+Feature engineering will focus on data preparation: removing irrelevant or leakage-prone columns, encoding categorical variables, scaling numerical predictors, and applying additional cleaning techniques (for example, duplicate handling and basic outlier checks) to produce stable model inputs.
 
 Steps involved in designing IDS model:
 
@@ -27,7 +27,7 @@ Apply min-max normalisation;
 Map detailed attack labels into binary normal or intrusion classes;
 Randomly select at least 5,000 samples;
 Split data into training, validation, and test subsets;
-Apply PCA;
+Remove non-relevant or redundant predictors (feature filtering);
 Train the chosen ML model;
 Evaluate accuracy, precision, recall, and F-score;
 Document the full procedure and results.
@@ -36,7 +36,7 @@ Document the full procedure and results.
 
 ML requirements:
 
-The work brief requires a machine learning IDS designed with a recognised workflow such as CRISP-DM. This means defining the business goal, understanding the data, preparing features, building a model, evaluating performance, and preparing the solution for documented deployment. The project requires prior knowledge of Python programming, core ML concepts, parameter tuning, binary classification, and matrix-based operations used in scaling and PCA.
+The work brief requires a machine learning IDS designed with a recognised workflow such as CRISP-DM. This means defining the business goal, understanding the data, preparing features, building a model, evaluating performance, and preparing the solution for documented deployment. The project requires prior knowledge of Python programming, core ML concepts, parameter tuning, binary classification, and matrix-based operations used in encoding and scaling.
 
 Characteristics of NSL-KDD dataset:
 
@@ -48,7 +48,7 @@ The dataset is large enough to satisfy the requirement to randomly select at lea
 
 Procedure for data transformation:
 
-Remove duplicate records if required; randomly sample the required dataset size; convert categorical fields using encoding; convert `labels` into binary classes; apply min-max normalisation to numerical predictors; split the data into 70:30 training and testing proportions; then apply PCA to produce a reduced feature subset.
+Remove duplicate records if required; randomly sample the required dataset size; convert categorical fields using encoding; convert `labels` into binary classes; apply min-max normalisation (or standardisation) to numerical predictors; split the data into 70:30 training and testing proportions; then drop columns judged not relevant for training (for example identifiers, constant/near-constant fields, or leakage-prone attributes) and document the final retained feature set.
 
 List of default and non-default training parameters:
 
@@ -61,7 +61,7 @@ For a supervised baseline, `MLPClassifier` can be used. Default parameters inclu
 - Training of IDS dataset
 - Set training data parameters
 - IDS dataset model size
-- Algorithm for applying feature engineering process using PCA
+- Algorithm for feature selection and preprocessing (column filtering + normalisation)
 - Final IDS procedure through Block Diagram
 
 # Activity 3: Arrange validation datasets.
