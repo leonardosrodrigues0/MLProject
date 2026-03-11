@@ -25,6 +25,7 @@ from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 DEFAULT_DATASET_PATH = Path("data/nsl_kdd_dataset.csv")
 TARGET_COL = "labels"
 DEFAULT_CATEGORICAL_COLS = ("protocol_type", "service", "flag")
+DEFAULT_THRESHOLD = 0.50
 
 
 def _parse_hidden_layer_sizes(value: str) -> tuple[int, ...]:
@@ -70,6 +71,12 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--early-stopping", action="store_true")
     parser.add_argument("--n-iter-no-change", type=int, default=10)
     parser.add_argument("--learning-rate-init", type=float, default=0.001)
+    parser.add_argument(
+        "--threshold",
+        type=float,
+        default=DEFAULT_THRESHOLD,
+        help="Decision threshold for predicting attack (class=1) from predicted probability.",
+    )
     parser.add_argument(
         "--verbose",
         action="store_true",
@@ -137,6 +144,20 @@ def _mlp_param_count(input_features: int, hidden_layer_sizes: Sequence[int]) -> 
     for n_in, n_out in zip(layer_sizes, layer_sizes[1:]):
         total += n_in * n_out + n_out
     return int(total)
+
+
+def _predict_with_threshold(pipeline: Pipeline, X: pd.DataFrame, *, threshold: float) -> pd.Series:
+    if not (0.0 < threshold < 1.0):
+        raise ValueError("--threshold must be between 0 and 1 (exclusive).")
+
+    proba = pipeline.predict_proba(X)
+    classes = pipeline.named_steps["model"].classes_
+    try:
+        attack_idx = list(classes).index(1)
+    except ValueError as e:
+        raise RuntimeError(f"Expected model classes to include 1, got {classes!r}") from e
+
+    return pd.Series((proba[:, attack_idx] >= threshold).astype("int64"), index=X.index)
 
 
 def main() -> None:
@@ -237,11 +258,12 @@ def main() -> None:
     print(f"Features (after encoding/scaling): {n_features}")
     print(f"MLP hidden layers: {args.hidden_layer_sizes}")
     print(f"Approx. trainable parameters: {_mlp_param_count(n_features, args.hidden_layer_sizes)}")
+    print(f"Decision threshold (attack): {args.threshold:.2f}")
     print()
 
-    _print_metrics("Train", y_train, pipeline.predict(X_train))
-    _print_metrics("Val  ", y_val, pipeline.predict(X_val))
-    _print_metrics("Test ", y_test, pipeline.predict(X_test))
+    _print_metrics("Train", y_train, _predict_with_threshold(pipeline, X_train, threshold=args.threshold))
+    _print_metrics("Val  ", y_val, _predict_with_threshold(pipeline, X_val, threshold=args.threshold))
+    _print_metrics("Test ", y_test, _predict_with_threshold(pipeline, X_test, threshold=args.threshold))
 
 
 if __name__ == "__main__":
