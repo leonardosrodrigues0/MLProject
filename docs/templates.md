@@ -129,8 +129,8 @@ Issues resolved:
 
 One value for each metric:
 
-- Classification testing accuracy
-- Training accuracy
-- Precision
-- Recall
-- F-score
+- Classification testing accuracy: 0.9840
+- Training accuracy: 0.9928
+- Precision: 0.9817
+- Recall: 0.9864
+- F-score: 0.9841
