@@ -52,7 +52,7 @@ Remove duplicate records if required; convert categorical fields using encoding;
 
 List of default and non-default training parameters:
 
-For a supervised baseline, `MLPClassifier` can be used. Default parameters include `activation='relu'`, `solver='adam'`, `alpha=0.0001`, and `learning_rate='constant'`. Non-default parameters proposed for this project are `hidden_layer_sizes=(64, 32)`, `max_iter=100`, `random_state=42`, and `early_stopping=True`.
+For a supervised baseline, `MLPClassifier` can be used. Default parameters include `activation='relu'`, the default solver (adam), `alpha=0.0001`, and `learning_rate_init=0.001`. Non-default parameters proposed for this project are `hidden_layer_sizes=(64, 32)`, `max_iter=100`, `random_state=42`, and `early_stopping=True`.
 
 # Activity 2: Arrange machine training datasets.
 
@@ -86,8 +86,13 @@ Final IDS procedure through Block Diagram:
 
 ## Template 4: Supervisor feedback on recommendations (in 150-200 words)
 
-- Functionality issues of ML parameters
-- Refined ML parameters
+Functionality issues of ML parameters:
+
+During baseline training, the `MLPClassifier` raised a convergence warning when `max_iter=100`, indicating the optimiser had not reached a stable minimum. This is a functionality issue because it can lead to unstable performance across runs and makes it harder to justify results (the model may stop improving early). A smaller but expected issue was a modest generalisation gap between training and validation performance, which suggests the need to balance training time and regularisation. No class-imbalance issues were observed after converting `labels` into binary classes, as the dataset is approximately 50/50 normal vs attack after duplicate removal.
+
+Refined ML parameters:
+
+To address convergence and stabilise validation performance, the model parameters were refined by increasing training iterations and tuning regularisation. The refined configuration is `hidden_layer_sizes=(64, 32)`, `max_iter=300`, `alpha=0.00005`, and `random_state=42` to keep results reproducible. With the same preprocessing pipeline (one-hot encoding + min-max scaling and constant-column dropping), the refined settings remove the convergence warning in typical runs and slightly improve validation F1 compared to the baseline while maintaining similar test performance.
 
 ## Template 5: Code and screenshots
 

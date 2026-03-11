@@ -1,18 +1,17 @@
 """
-Activity 2: Arrange machine training datasets.
-
 Loads the NSL-KDD CSV, performs basic cleaning and feature preparation, splits the
 full dataset into train/validation/test, then trains a baseline classifier.
 
 Run:
-  python3 scripts/activity2_train.py
-  python3 scripts/activity2_train.py --drop-duplicates --drop-cols num_outbound_cmds
+  python3 scripts/train_ids.py --drop-duplicates --drop-constant-cols
+  python3 scripts/train_ids.py --drop-duplicates --drop-constant-cols --verbose
 """
 
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
+from typing import Sequence
 
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -26,6 +25,19 @@ from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 DEFAULT_DATASET_PATH = Path("data/nsl_kdd_dataset.csv")
 TARGET_COL = "labels"
 DEFAULT_CATEGORICAL_COLS = ("protocol_type", "service", "flag")
+
+
+def _parse_hidden_layer_sizes(value: str) -> tuple[int, ...]:
+    parts = [p.strip() for p in value.split(",") if p.strip()]
+    if not parts:
+        raise argparse.ArgumentTypeError("hidden-layer-sizes must be a comma-separated list, e.g. 64,32")
+    try:
+        sizes = tuple(int(p) for p in parts)
+    except ValueError as e:
+        raise argparse.ArgumentTypeError("hidden-layer-sizes must contain integers") from e
+    if any(s <= 0 for s in sizes):
+        raise argparse.ArgumentTypeError("hidden-layer-sizes must be positive integers")
+    return sizes
 
 
 def _parse_args() -> argparse.Namespace:
@@ -47,7 +59,12 @@ def _parse_args() -> argparse.Namespace:
         action="store_true",
         help="Drop columns with <= 1 unique value in the full dataset.",
     )
-    parser.add_argument("--max-iter", type=int, default=100)
+    parser.add_argument("--max-iter", type=int, default=300)
+    parser.add_argument("--hidden-layer-sizes", type=_parse_hidden_layer_sizes, default=(64, 32))
+    parser.add_argument("--alpha", type=float, default=0.00005)
+    parser.add_argument("--early-stopping", action="store_true")
+    parser.add_argument("--n-iter-no-change", type=int, default=10)
+    parser.add_argument("--learning-rate-init", type=float, default=0.001)
     parser.add_argument(
         "--verbose",
         action="store_true",
@@ -107,6 +124,14 @@ def _print_metrics(split_name: str, y_true: pd.Series, y_pred: pd.Series) -> Non
     rec = recall_score(y_true, y_pred, zero_division=0)
     f1 = f1_score(y_true, y_pred, zero_division=0)
     print(f"{split_name}: accuracy={acc:.4f} precision={prec:.4f} recall={rec:.4f} f1={f1:.4f}")
+
+
+def _mlp_param_count(input_features: int, hidden_layer_sizes: Sequence[int]) -> int:
+    layer_sizes = (input_features, *hidden_layer_sizes, 1)
+    total = 0
+    for n_in, n_out in zip(layer_sizes, layer_sizes[1:]):
+        total += n_in * n_out + n_out
+    return int(total)
 
 
 def main() -> None:
@@ -170,8 +195,12 @@ def main() -> None:
         remainder="drop",
     )
     model = MLPClassifier(
-        hidden_layer_sizes=(64, 32),
+        hidden_layer_sizes=args.hidden_layer_sizes,
         max_iter=args.max_iter,
+        alpha=args.alpha,
+        early_stopping=args.early_stopping,
+        n_iter_no_change=args.n_iter_no_change,
+        learning_rate_init=args.learning_rate_init,
         random_state=args.random_state,
     )
     pipeline = Pipeline([("preprocess", preprocessor), ("model", model)])
@@ -191,18 +220,9 @@ def main() -> None:
     # Report the dimensionality after encoding/scaling so "model size" is concrete.
     feature_names = pipeline.named_steps["preprocess"].get_feature_names_out()
     n_features = int(len(feature_names))
-    layer_sizes = (n_features, 64, 32, 1)
-    approx_params = (
-        layer_sizes[0] * layer_sizes[1]
-        + layer_sizes[1]
-        + layer_sizes[1] * layer_sizes[2]
-        + layer_sizes[2]
-        + layer_sizes[2] * layer_sizes[3]
-        + layer_sizes[3]
-    )
     print(f"Features (after encoding/scaling): {n_features}")
-    print(f"MLP topology: {layer_sizes[0]} -> 64 -> 32 -> 1")
-    print(f"Approx. trainable parameters: {approx_params}")
+    print(f"MLP hidden layers: {args.hidden_layer_sizes}")
+    print(f"Approx. trainable parameters: {_mlp_param_count(n_features, args.hidden_layer_sizes)}")
     print()
 
     _print_metrics("Train", y_train, pipeline.predict(X_train))
