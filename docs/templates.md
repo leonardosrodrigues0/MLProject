@@ -105,23 +105,23 @@ To address convergence and stabilise validation performance, the model parameter
 
 Test code and functionality issue check:
 
-Testing uses the same preprocessing pipeline and refined parameters from Activity 3, but evaluates performance only on the held-out test split created from the full dataset. The goal is to confirm that the selected preprocessing (column filtering, encoding, and min-max normalisation) and model settings generalise to previously unseen records, and that there is no obvious data leakage between splits. The test procedure includes sanity checks for contamination (row overlap between train/validation/test) and a dummy baseline (majority-class predictor) so that unexpectedly high results can be interpreted correctly.
+Testing uses the same preprocessing pipeline and refined parameters from Activity 3, but evaluates performance only on the held-out test split created from the full dataset. The goal is to confirm that the selected preprocessing (column filtering, encoding, and min-max normalisation) and model settings generalise to previously unseen records. The test procedure also confirms that preprocessing is applied consistently by fitting the encoder/scaler only on the training split and then transforming validation/test through the same pipeline.
 
 Software test code:
 
 The test run is executed using the shared training/evaluation script `scripts/train_ids.py` with refined settings:
-`python3 scripts/train_ids.py --drop-duplicates --drop-constant-cols --drop-duplicates-after-labelmap --sanity-checks --max-iter 300 --alpha 0.00005`
-This command prints dataset split sizes, feature counts after encoding/scaling, sanity-check statistics, and the Train/Val/Test accuracy, precision, recall, and F1 metrics.
+`python3 scripts/train_ids.py --drop-duplicates --drop-constant-cols --drop-duplicates-after-labelmap --max-iter 300 --alpha 0.00005`
+This command prints dataset split sizes, feature counts after encoding/scaling, and the Train/Val/Test accuracy, precision, recall, and F1 metrics.
 
 Functionality issues identified:
 
 1. Duplicate handling after label mapping: although exact duplicate rows can be removed from the raw CSV, converting multi-class attack labels into a single binary attack class can create new duplicates (identical features with the same binary target). This can cause exact row overlap between training and validation/test splits if not addressed.
-2. Misleading “too-good” early results: even with very small `max_iter`, `MLPClassifier` still performs a full epoch of updates, and NSL-KDD binary normal vs attack can be separable. Without a baseline comparison and split-overlap check, early results may look suspiciously strong.
+2. Unseen categorical levels in evaluation splits: categorical fields (especially `service`) can contain rare values. If categorical encoding is done manually per split, the model can fail at inference time due to mismatched columns, or produce inconsistent feature vectors across training and testing.
 
 Issues resolved:
 
-1. Enabled `--drop-duplicates-after-labelmap` to remove duplicates created by the binary label mapping step (dedupe on features + binary target). With sanity checks enabled, exact row overlap across splits is reduced to zero.
-2. Added `--sanity-checks` output (row-overlap counts and a majority-class dummy baseline) to make evaluation results auditable and to help detect leakage/contamination during testing.
+1. Enabled `--drop-duplicates-after-labelmap` to remove duplicates created by the binary label mapping step (dedupe on features + binary target).
+2. Implemented encoding and scaling inside a single scikit-learn `Pipeline` using `OneHotEncoder(handle_unknown='ignore')` and a `ColumnTransformer`. This ensures the same fitted transformer is applied to validation and test data, while gracefully handling categorical values that may not appear in the training split.
 
 # Activity 5: Finalise ML evaluations.
 

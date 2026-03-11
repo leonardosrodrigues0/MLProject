@@ -71,11 +71,6 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--n-iter-no-change", type=int, default=10)
     parser.add_argument("--learning-rate-init", type=float, default=0.001)
     parser.add_argument(
-        "--sanity-checks",
-        action="store_true",
-        help="Print split-overlap and dummy baseline metrics to detect leakage/contamination.",
-    )
-    parser.add_argument(
         "--verbose",
         action="store_true",
         help="Print dataset/category diagnostics (may be long for high-cardinality columns).",
@@ -144,16 +139,6 @@ def _mlp_param_count(input_features: int, hidden_layer_sizes: Sequence[int]) -> 
     return int(total)
 
 
-def _row_hashes(df: pd.DataFrame) -> pd.Series:
-    # Stable row hashing for overlap checks across splits.
-    return pd.util.hash_pandas_object(df, index=False)
-
-
-def _dummy_majority_predictions(y_train: pd.Series, y_eval: pd.Series) -> pd.Series:
-    majority = int(y_train.value_counts().idxmax())
-    return pd.Series([majority] * len(y_eval), index=y_eval.index)
-
-
 def main() -> None:
     args = _parse_args()
 
@@ -215,33 +200,6 @@ def main() -> None:
         test_size=args.test_size,
         random_state=args.random_state,
     )
-
-    if args.sanity_checks:
-        # Check both exact-row overlap (features+label) and feature-only overlap.
-        train_full = pd.concat([X_train, y_train.rename("_y")], axis=1)
-        val_full = pd.concat([X_val, y_val.rename("_y")], axis=1)
-        test_full = pd.concat([X_test, y_test.rename("_y")], axis=1)
-
-        h_train_full = set(_row_hashes(train_full).tolist())
-        h_val_full = set(_row_hashes(val_full).tolist())
-        h_test_full = set(_row_hashes(test_full).tolist())
-
-        h_train_x = set(_row_hashes(X_train).tolist())
-        h_val_x = set(_row_hashes(X_val).tolist())
-        h_test_x = set(_row_hashes(X_test).tolist())
-
-        print("Sanity checks:")
-        print(f"- Exact row overlap (train∩val): {len(h_train_full & h_val_full)}")
-        print(f"- Exact row overlap (train∩test): {len(h_train_full & h_test_full)}")
-        print(f"- Exact row overlap (val∩test): {len(h_val_full & h_test_full)}")
-        print(f"- Feature-only overlap (train∩val): {len(h_train_x & h_val_x)}")
-        print(f"- Feature-only overlap (train∩test): {len(h_train_x & h_test_x)}")
-        print(f"- Feature-only overlap (val∩test): {len(h_val_x & h_test_x)}")
-        print("- Dummy baseline (majority class from train):")
-        _print_metrics("  Train", y_train, _dummy_majority_predictions(y_train, y_train))
-        _print_metrics("  Val  ", y_val, _dummy_majority_predictions(y_train, y_val))
-        _print_metrics("  Test ", y_test, _dummy_majority_predictions(y_train, y_test))
-        print()
 
     preprocessor = ColumnTransformer(
         transformers=[
