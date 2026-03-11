@@ -25,7 +25,7 @@ Inspect and understand dataset attributes;
 Convert categorical fields to numeric form;
 Apply min-max normalisation;
 Map detailed attack labels into binary normal or intrusion classes;
-Randomly select at least 5,000 samples;
+Use the full dataset as input;
 Split data into training, validation, and test subsets;
 Remove non-relevant or redundant predictors (feature filtering);
 Train the chosen ML model;
@@ -44,11 +44,11 @@ The current `data/nsl_kdd_dataset.csv` contains 22,544 records and 42 columns. T
 
 Specifications of NSL-KDD dataset:
 
-The dataset is large enough to satisfy the requirement to randomly select at least 5,000 samples. It includes connection-based traffic features such as byte counts, login behaviour, error rates, host statistics, and service patterns, which are appropriate for IDS modelling.
+The dataset is large enough to support training on the full available records and splitting into separate training, validation, and test subsets. It includes connection-based traffic features such as byte counts, login behaviour, error rates, host statistics, and service patterns, which are appropriate for IDS modelling.
 
 Procedure for data transformation:
 
-Remove duplicate records if required; randomly sample the required dataset size; convert categorical fields using encoding; convert `labels` into binary classes; apply min-max normalisation (or standardisation) to numerical predictors; split the data into 70:30 training and testing proportions; then drop columns judged not relevant for training (for example identifiers, constant/near-constant fields, or leakage-prone attributes) and document the final retained feature set.
+Remove duplicate records if required; convert categorical fields using encoding; convert `labels` into binary classes; apply min-max normalisation (or standardisation) to numerical predictors; split the full dataset into training, validation, and testing subsets; then drop columns judged not relevant for training (for example identifiers, constant/near-constant fields, or leakage-prone attributes) and document the final retained feature set.
 
 List of default and non-default training parameters:
 
@@ -58,11 +58,29 @@ For a supervised baseline, `MLPClassifier` can be used. Default parameters inclu
 
 ## Template 3: Training of IDS dataset (in 450-500 words)
 
-- Training of IDS dataset
-- Set training data parameters
-- IDS dataset model size
-- Algorithm for feature selection and preprocessing (column filtering + normalisation)
-- Final IDS procedure through Block Diagram
+Training of IDS dataset:
+
+The NSL-KDD dataset (`data/nsl_kdd_dataset.csv`) is used as the sole input source for model training. The dataset contains 22,544 network connection records with 41 predictor columns and one target column (`labels`). The predictors include three categorical attributes (`protocol_type`, `service`, and `flag`) and a set of numerical attributes that capture connection duration, byte counts, login behaviour, error rates, and host/service statistics. For the IDS use-case, the target is converted to binary classes: `normal` is treated as legitimate traffic and every other label is treated as an intrusion (attack). To keep the process auditable and repeatable, the entire dataset is considered (no down-sampling step) and preprocessing decisions are applied consistently across all splits.
+
+Set training data parameters:
+
+The full dataset is split into training, validation, and test subsets using a stratified split to preserve the normal/attack class proportion across all subsets. The default split used in Activity 2 is 70% training, 15% validation, and 15% test, controlled by a fixed `random_state=42` for reproducibility. The baseline learning algorithm is a multi-layer perceptron classifier (`MLPClassifier`) with `max_iter=100` for this initial training run. The purpose of this activity is to establish a working training pipeline (data preparation plus a baseline model) that can later be refined in Activities 3 and 4 by adjusting parameters and re-evaluating performance.
+
+IDS dataset model size:
+
+Model size is determined by (1) the number of input features after encoding and scaling, and (2) the chosen network topology. Categorical predictors are one-hot encoded, which expands the raw feature space into multiple indicator columns. With the current dataset and preprocessing pipeline, the encoded feature vector contains 116 input features. The baseline topology used is `116 -> 64 -> 32 -> 1`, meaning two hidden layers with 64 and 32 neurons and a single output unit for binary classification. This corresponds to approximately 9,601 trainable parameters (weights and biases).
+
+Algorithm for feature selection and preprocessing (column filtering + normalisation):
+
+1. Load the CSV and confirm `labels` exists as the target column.
+2. Optionally remove duplicate records.
+3. Apply column filtering on the raw table before encoding: automatically drop constant columns (for example, `num_outbound_cmds` is constant in this dataset) and optionally drop any additional columns judged not relevant for training (such as leakage-prone or redundant predictors).
+4. Convert the target into binary classes: `y = 1` for attacks (`labels != 'normal'`) and `y = 0` for normal traffic.
+5. Split the full dataset into train/validation/test using stratification.
+6. Build a preprocessing pipeline where categorical columns are one-hot encoded (`handle_unknown='ignore'`) and numeric columns are scaled using min-max normalisation.
+7. Train the baseline `MLPClassifier` on the training split, use the validation split for tuning decisions in later activities, and reserve the test split for final evaluation.
+
+Final IDS procedure through Block Diagram:
 
 # Activity 3: Arrange validation datasets.
 
